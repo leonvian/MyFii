@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">MeuFi</string>
+
+    <plurals name="quotas">
+        <item quantity="one">%1$s quote:</item>
+        <item quantity="other">%1$s quotes:</item>
+    </plurals>
+
+    <string name="your_fiis">Your fiis</string>
+    <string name="wallet">Wallet</string>
+    <string name="add">ADD</string>
+    <string name="loading_text">We are collecting data!</string>
+
+</resources>
