@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,30 +45,41 @@ import com.lvc.meufi.utils.toDateString
 
 @Composable
 fun HomeScreenView(
+    modifier: Modifier = Modifier,
     loading: Boolean = true,
-    dividendPages: List<DividendPageData>
+    dividendPages: List<DividendPageData>,
+    onClickDividend: (FiiDividendData) -> Unit
 ) {
     if (loading) {
         LoadingView()
     } else {
-        WalletScreen(dividendPages)
+        WalletScreen(
+            modifier = modifier,
+            dividendPages = dividendPages,
+            onClickDividend = onClickDividend
+        )
     }
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun WalletScreen(dividendPages: List<DividendPageData>) {
-    Column {
+private fun WalletScreen(
+    modifier: Modifier,
+    dividendPages: List<DividendPageData>,
+    onClickDividend: (FiiDividendData) -> Unit
+) {
+    Column(
+        modifier = modifier
+    ) {
         WalletTitle()
         HorizontalPager(
-            modifier = Modifier
-                .background(color = Color.White),
             count = dividendPages.size,
             contentPadding = PaddingValues(horizontal = 16.dp),
             itemSpacing = 8.dp
         ) { page ->
             DividendsPageView(
-                dividendPageData = dividendPages[page]
+                dividendPageData = dividendPages[page],
+                onClickDividend = onClickDividend
             )
         }
     }
@@ -77,8 +87,9 @@ private fun WalletScreen(dividendPages: List<DividendPageData>) {
 
 @Composable
 private fun LoadingView() {
-    Column(
-        modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -95,7 +106,6 @@ private fun LoadingView() {
         }
     }
 }
-
 
 @Composable
 private fun WalletTitle() {
@@ -121,11 +131,13 @@ private fun WalletTitle() {
             Text(text = stringResource(id = R.string.add), fontSize = 16.sp)
         }
     }
-
 }
 
 @Composable
-fun DividendsPageView(dividendPageData: DividendPageData) {
+fun DividendsPageView(
+    dividendPageData: DividendPageData,
+    onClickDividend: (FiiDividendData) -> Unit
+) {
     Column(
         Modifier
             .fillMaxSize()
@@ -143,7 +155,7 @@ fun DividendsPageView(dividendPageData: DividendPageData) {
 
         ) {
             items(dividendPageData.dividendData) { item ->
-                DividendCard(dividendData = item)
+                DividendCard(dividendData = item, onClickDividend = onClickDividend)
             }
         }
     }
@@ -215,14 +227,17 @@ private fun YourFiis(fiiAmount: Int) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun DividendCard(dividendData: FiiDividendData) {
+fun DividendCard(
+    dividendData: FiiDividendData,
+    onClickDividend: (FiiDividendData) -> Unit
+) {
     Box(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .background(FiiColor.Grey100, RoundedCornerShape(8.dp))
             .clickable {
-
+                onClickDividend(dividendData)
             }
             .padding(16.dp)
     ) {
@@ -274,4 +289,3 @@ fun DividendCard(dividendData: FiiDividendData) {
         }
     }
 }
-

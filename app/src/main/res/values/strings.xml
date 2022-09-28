@@ -11,4 +11,7 @@
     <string name="add">ADD</string>
     <string name="loading_text">We are collecting data!</string>
 
+    <string name="fii_code">Fii Code</string>
+    <string name="amount">Amount</string>
+
 </resources>

@@ -1,7 +1,6 @@
 package com.lvc.meufi.persistence.local
 
 import android.content.Context
-import android.content.SharedPreferences
 
 private const val PREF_NAME = "LocalDataRegister"
 private const val KNOWN_DATA_SAVED_NAME = "KNOWN_DATA_SAVED"

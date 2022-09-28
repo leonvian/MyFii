@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lvc.meufi.model.Fii
 import com.lvc.meufi.model.FiiDividend
 import com.lvc.meufi.model.FiiType
+import com.lvc.meufi.model.MonthDayYear
 import com.lvc.meufi.model.MyFii
 import com.lvc.meufi.persistence.local.FiiDAO
 import com.lvc.meufi.persistence.local.FiiDatabase
@@ -26,7 +27,7 @@ import org.junit.runner.RunWith
 class MyFiiDAOTest {
 
     companion object {
-        const val FII_CODE_EXAMPLE = "HSAF11"
+        private const val FII_CODE_EXAMPLE = "HSAF11"
     }
 
     private lateinit var database: FiiDatabase
@@ -69,7 +70,7 @@ class MyFiiDAOTest {
     }
 
     @Test
-    fun saveFiiWithDividends() = runTest {
+    fun ensureDividendDataWillBeReturned_whenThereIsFiisOnTheWalletAndDividends() = runTest {
         // SAVE A FII
         fiiDAO.saverOrUpdate(
             Fii(
@@ -149,7 +150,38 @@ class MyFiiDAOTest {
     }
 
     @Test
-    fun updateFiiInfo() = runTest {
+    fun ensureReturnFiiByDateCorrectly() = runTest {
+        val myFii = MyFii(
+            fiiCode = FII_CODE_EXAMPLE,
+            amount = 10,
+            updatedAt = MonthDayYear(1,2022)
+        )
+        myFiiDAO.saverOrUpdate(myFii)
+
+        myFiiDAO.getSingleFiiFromDate(1, 2022).let { fii ->
+            Assert.assertNotNull(fii)
+            assert(fii?.fiiCode == FII_CODE_EXAMPLE)
+            assert(fii?.amount == 10)
+        }
+    }
+
+    @Test
+    fun ensureReturnFiiNullByUnsavedDate() = runTest {
+        val myFii = MyFii(
+            fiiCode = FII_CODE_EXAMPLE,
+            amount = 10,
+            updatedAt = MonthDayYear(1,2022)
+        )
+        myFiiDAO.saverOrUpdate(myFii)
+
+        myFiiDAO.getSingleFiiFromDate(2, 2022).let { fii ->
+            Assert.assertNull(fii)
+        }
+    }
+
+
+    @Test
+    fun updateFiiOnTheWallet() = runTest {
         // Save an element
         val myFii = MyFii(
             fiiCode = FII_CODE_EXAMPLE,

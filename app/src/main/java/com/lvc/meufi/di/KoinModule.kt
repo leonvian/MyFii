@@ -1,6 +1,7 @@
 package com.lvc.meufi.di
 
-import com.lvc.meufi.data_scripts.InitialScripManager
+import com.lvc.meufi.add.AddFiiViewModel
+import com.lvc.meufi.data_scripts.ScripManager
 import com.lvc.meufi.home.HomeViewModel
 import com.lvc.meufi.persistence.FiiDividendRepository
 import com.lvc.meufi.persistence.local.FiiDatabase
@@ -28,9 +29,11 @@ val appModule = module {
         FiiDatabase.createDatabase(androidContext()).createMyFiiDAO()
     }
 
-    single { FiiDividendRepository(get(), get(), get(), get(), get() ) }
+    single { FiiDividendRepository(get(), get(), get(), get() ) }
 
-    single { InitialScripManager(get(), get(), get() ) }
+    single { ScripManager(get(), get(), get() ) }
 
     viewModel { HomeViewModel(get()) }
+
+    viewModel { AddFiiViewModel() }
 }
