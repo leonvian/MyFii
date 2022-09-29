@@ -40,4 +40,6 @@ fun Float.round2Places(): String {
 }
 
 private fun String.brMoneyStyle(): String =
-    replace(".", ",").replace("$", "")
+    replace(".", ",")
+        .replace("$", "")
+        .replace("R", "")
