@@ -1,11 +1,9 @@
 package com.lvc.meufi.data_scripts
 
-import com.lvc.meufi.model.MonthDayYear
 import com.lvc.meufi.persistence.local.FiiDAO
 import com.lvc.meufi.persistence.local.LocalDataRegister
 import com.lvc.meufi.persistence.local.MyFiiDAO
-import com.lvc.meufi.utils.toMonthYear
-import java.time.Month
+import com.lvc.meufi.utils.toMonthYearDay
 import java.util.Calendar
 import java.util.Date
 
@@ -25,9 +23,9 @@ class ScripManager(
             val calendar = Calendar.getInstance()
             // get fiis from last month and update them with the current month
             calendar.add(Calendar.MONTH, -1)
-            val lastMonth = calendar.time.toMonthYear()
+            val lastMonth = calendar.time.toMonthYearDay()
             val updatedFiis = myFiiDAO.getFiiFromDate(lastMonth.month, lastMonth.year).map {
-                it.copy(updatedAt = Date().toMonthYear())
+                it.copy(updatedAt = Date().toMonthYearDay())
             }
             myFiiDAO.saverOrUpdate(updatedFiis)
         }
@@ -35,7 +33,7 @@ class ScripManager(
 
     private suspend fun MyFiiDAO.fiisNotUpdatedForCurrentMonth(): Boolean {
         val calendar = Calendar.getInstance()
-        val thisMonth = calendar.time.toMonthYear()
+        val thisMonth = calendar.time.toMonthYearDay()
         return getSingleFiiFromDate(thisMonth.month, thisMonth.year) == null
     }
 

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.BottomSheetState
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
@@ -31,7 +32,11 @@ import com.lvc.meufi.add.AddFiiView
 import com.lvc.meufi.add.AddFiiViewModel
 import com.lvc.meufi.home.HomeScreenView
 import com.lvc.meufi.home.HomeViewModel
+import com.lvc.meufi.model.MonthDayYear
 import com.lvc.meufi.ui.theme.MeuFiTheme
+import com.lvc.meufi.utils.toMonthYearDay
+import java.util.Date
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -80,7 +85,10 @@ class MainActivity : ComponentActivity() {
                         scaffoldState = scaffoldState,
                         sheetPeekHeight = 0.dp,
                         sheetContent = {
-                            SheetContent()
+                            SheetContent(
+                                bottomSheetState = bottomSheetState,
+                                coroutineScope = coroutineScope
+                            )
                             BackHandler(enabled = bottomSheetState.isExpanded) {
                                 coroutineScope.launch {
                                     scaffoldState.bottomSheetState.collapse()
@@ -91,19 +99,29 @@ class MainActivity : ComponentActivity() {
                         HomeScreenView(
                             modifier = Modifier.alpha(backgroundAlpha),
                             loading = homeViewModel.loading.value,
-                            dividendPages = homeViewModel.dividendPages.value,
+                            dividendPage = homeViewModel.dividendPage.value,
                             onClickDividend = {
-                                addFiiViewModel.onFiiCode(it.fiiCode)
+                                addFiiViewModel.applyFiiToEdit(it)
                                 coroutineScope.launch {
                                     scaffoldState.toggle()
                                 }
-                            }
+                            },
+                            onAddClick = {
+                                addFiiViewModel.applyEntryFii()
+                                coroutineScope.launch {
+                                    scaffoldState.toggle()
+                                }
+                            },
+                            selectedMonth = homeViewModel.selectedMonth.value,
+                            onSelectMonth = homeViewModel::onSelectedMonth,
+                            months = homeViewModel.months.value
                         )
                     }
                 }
             }
         }
 
+        homeViewModel.loadMonthsToDisplay()
         loadData()
     }
 
@@ -116,13 +134,17 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun SheetContent() {
+    private fun SheetContent(
+        bottomSheetState: BottomSheetState,
+        coroutineScope: CoroutineScope
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
             AddFiiView(
+                isEditModeOn = addFiiViewModel.isEditModeOn.value,
                 fiiCode = addFiiViewModel.fiiCode.value,
                 fiiCodeOnValueChange = {
                     addFiiViewModel.onFiiCode(it)
@@ -133,12 +155,16 @@ class MainActivity : ComponentActivity() {
                 },
                 onSaveClicked = {
                     addFiiViewModel.onSaveClicked()
+                    coroutineScope.launch {
+                        bottomSheetState.collapse()
+                    }
+                    homeViewModel.reloadDividendPage()
                 }
             )
         }
     }
 
-    private fun loadData() {
-        homeViewModel.loadFiiDividedPage()
+    private fun loadData(monthDayYear: MonthDayYear = Date().toMonthYearDay()) {
+        homeViewModel.loadFiiDividedPage(monthDayYear)
     }
 }

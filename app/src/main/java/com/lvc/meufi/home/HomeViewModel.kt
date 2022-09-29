@@ -8,16 +8,28 @@ import com.lvc.meufi.home.data.DividendPageData
 import com.lvc.meufi.model.FiiDividendData
 import com.lvc.meufi.model.MonthDayYear
 import com.lvc.meufi.persistence.FiiDividendRepository
+import com.lvc.meufi.utils.toJustMonthYear
+import com.lvc.meufi.utils.toMonthYearDay
+import java.util.Calendar
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val fiiDividendRepository: FiiDividendRepository
 ) : ViewModel() {
 
-    val dividendPages = mutableStateOf(arrayListOf<DividendPageData>())
+    val dividendPage = mutableStateOf(DividendPageData())
     val loading = mutableStateOf(true)
+    val selectedMonth = mutableStateOf(
+        Calendar.getInstance().toJustMonthYear()
+    )
+    val months = mutableStateOf( listOf<MonthDayYear>() )
 
-    fun loadFiiDividedPage() {
+    fun onSelectedMonth(monthDayYear: MonthDayYear) {
+        selectedMonth.value = monthDayYear
+        loadFiiDividedPage(monthDayYear)
+    }
+
+    fun loadFiiDividedPage(monthDayYear: MonthDayYear) {
         viewModelScope.launch {
             loading.value = true
 
@@ -25,53 +37,38 @@ class HomeViewModel(
             fiiDividendRepository.loadFiiDividends()
 
             Log.i("DATA", "Get Dividends Locally")
-            val listDividendPage = arrayListOf<DividendPageData>()
-            val fiiDividendData = fiiDividendRepository.getFiiWithDividendLocally()
-            var dividendsFromPastMonth = 0f
-            fiiDividendData.getMonthsThatContainsDividends().forEach {
-                val dividendPageData = fiiDividendData
-                    .filterByMonth(it)
-                    .toDividendPage(dividendsFromPastMonth)
-
-                listDividendPage.add(dividendPageData)
-                dividendsFromPastMonth = dividendPageData.dividendSum
+            val fiiDividendData = fiiDividendRepository.getFiiOnWalletData(monthDayYear)
+            if (fiiDividendData.isNotEmpty()) {
+                dividendPage.value = fiiDividendData.toDividendPage()
+            } else {
+                dividendPage.value = DividendPageData(monthDayYear)
             }
-            dividendPages.value = listDividendPage
+
             loading.value = false
         }
     }
 
-    private fun List<FiiDividendData>.getMonthsThatContainsDividends() =
-        this.map {
-            it.monthYear
-        }.sortedBy {
-            it
-        }.distinctBy {
-            Pair(it.year, it.month)
+    fun loadMonthsToDisplay() {
+        viewModelScope.launch {
+           months.value = fiiDividendRepository.getDatesThatContainsFiis()
         }
+    }
 
-    private fun List<FiiDividendData>.filterByMonth(targetMonthYear: MonthDayYear) =
-        this.filter {
-            it.monthYear.month == targetMonthYear.month &&
-                    it.monthYear.year == targetMonthYear.year
-        }
+    fun reloadDividendPage() {
+        loadFiiDividedPage(selectedMonth.value)
+    }
 
-    private fun List<FiiDividendData>.toDividendPage(previousMonthDividends: Float): DividendPageData {
+    private fun List<FiiDividendData>.toDividendPage(): DividendPageData {
         val date: MonthDayYear = get(0).monthYear
         var dividendSum = 0f
         forEach {
             dividendSum += it.dividendSum
         }
-        val dividendDiffByPreviousMonth = if (previousMonthDividends == 0f) {
-            0f
-        } else {
-            dividendSum - previousMonthDividends
-        }
 
         return DividendPageData(
             date = date,
             dividendSum = dividendSum,
-            dividendDiffByPreviousMonth = dividendDiffByPreviousMonth,
+            dividendDiffByPreviousMonth = 0f,
             dividendData = this
         )
     }

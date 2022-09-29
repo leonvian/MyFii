@@ -1,11 +1,11 @@
 package com.lvc.meufi.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,16 +17,20 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.House
+import androidx.compose.material.icons.outlined.Pending
 import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -34,55 +38,94 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
 import com.lvc.meufi.R
 import com.lvc.meufi.home.data.DividendPageData
 import com.lvc.meufi.model.FiiDividendData
 import com.lvc.meufi.model.FiiType
-import com.lvc.meufi.utils.FiiColor
+import com.lvc.meufi.model.MonthDayYear
+import com.lvc.meufi.ui_components.MainIconButton
+import com.lvc.meufi.ui.theme.FiiColor
+import com.lvc.meufi.ui_components.MonthYearPicker
 import com.lvc.meufi.utils.toDateString
+import java.time.Month
+import java.util.Calendar
+import org.apache.xpath.operations.Mod
 
 @Composable
 fun HomeScreenView(
     modifier: Modifier = Modifier,
     loading: Boolean = true,
-    dividendPages: List<DividendPageData>,
-    onClickDividend: (FiiDividendData) -> Unit
+    dividendPage: DividendPageData,
+    onClickDividend: (FiiDividendData) -> Unit,
+    onAddClick: () -> Unit,
+    selectedMonth: MonthDayYear,
+    onSelectMonth: (MonthDayYear) -> Unit,
+    months: List<MonthDayYear>
 ) {
     if (loading) {
         LoadingView()
     } else {
         WalletScreen(
             modifier = modifier,
-            dividendPages = dividendPages,
+            dividendPageData = dividendPage,
+            onClickDividend = onClickDividend,
+            onAddClick = onAddClick,
+            selectedMonth = selectedMonth,
+            onSelectMonth = onSelectMonth,
+            months = months
+        )
+    }
+}
+
+@Composable
+private fun WalletScreen(
+    modifier: Modifier,
+    dividendPageData: DividendPageData,
+    selectedMonth: MonthDayYear,
+    onSelectMonth: (MonthDayYear) -> Unit,
+    onClickDividend: (FiiDividendData) -> Unit,
+    onAddClick: () -> Unit,
+    months: List<MonthDayYear>
+) {
+    val expandDate = remember { mutableStateOf(false) }
+    Column(
+        modifier = modifier
+    ) {
+        WalletTitle(
+            onAddClick = onAddClick,
+            onCalendarClick = {
+                expandDate.value = !expandDate.value
+            }
+        )
+
+        AnimatedVisibility(visible = expandDate.value) {
+            DatePicker(
+                selected = selectedMonth,
+                onSelectMonth = onSelectMonth,
+                months = months
+            )
+        }
+
+        DividendsPageView(
+            dividendPageData = dividendPageData,
             onClickDividend = onClickDividend
         )
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun WalletScreen(
-    modifier: Modifier,
-    dividendPages: List<DividendPageData>,
-    onClickDividend: (FiiDividendData) -> Unit
+private fun DatePicker(
+    selected: MonthDayYear,
+    onSelectMonth: (MonthDayYear) -> Unit,
+    months: List<MonthDayYear>
 ) {
-    Column(
-        modifier = modifier
-    ) {
-        WalletTitle()
-        HorizontalPager(
-            count = dividendPages.size,
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            itemSpacing = 8.dp
-        ) { page ->
-            DividendsPageView(
-                dividendPageData = dividendPages[page],
-                onClickDividend = onClickDividend
-            )
-        }
-    }
+    Spacer(modifier = Modifier.size(4.dp))
+    MonthYearPicker(
+        selected = selected,
+        months = months,
+        onSelectMonth = onSelectMonth
+    )
+    Spacer(modifier = Modifier.size(4.dp))
 }
 
 @Composable
@@ -108,7 +151,10 @@ private fun LoadingView() {
 }
 
 @Composable
-private fun WalletTitle() {
+private fun WalletTitle(
+    onAddClick: () -> Unit,
+    onCalendarClick: () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -122,13 +168,16 @@ private fun WalletTitle() {
             style = MaterialTheme.typography.h1
         )
 
-        Button(
-            modifier = Modifier.padding(16.dp),
-            onClick = {
+        Row {
+            MainIconButton(
+                icon = Icons.Outlined.CalendarMonth,
+                onClick = onCalendarClick
+            )
 
-            }
-        ) {
-            Text(text = stringResource(id = R.string.add), fontSize = 16.sp)
+            MainIconButton(
+                icon = Icons.Outlined.Add,
+                onClick = onAddClick
+            )
         }
     }
 }
@@ -184,20 +233,18 @@ private fun DividendsResume(dividendPageData: DividendPageData) {
         }
         Row {
             Text(
+                modifier = Modifier
+                    .align(Alignment.Bottom)
+                    .padding(4.dp),
+                text = stringResource(id = R.string.dividends_for),
+                fontSize = 12.sp,
+                style = MaterialTheme.typography.h2
+            )
+            Text(
                 text = dividendPageData.date.toDateString(),
-                fontSize = 12.sp,
-                style = MaterialTheme.typography.h2
-            )
-            Text(
-                text = ", ",
-                fontSize = 12.sp,
-                style = MaterialTheme.typography.h2
-            )
-            Text(
-                text = "${dividendPageData.dividendDiffByPreviousMonth}",
-                fontSize = 12.sp,
-                style = MaterialTheme.typography.h2,
-                color = FiiColor.Green600
+                fontSize = 16.sp,
+                color = MaterialTheme.colors.primary,
+                style = MaterialTheme.typography.h1
             )
         }
     }
@@ -245,6 +292,7 @@ fun DividendCard(
             FiiType.PAPER -> Icons.Outlined.Description
             FiiType.FOUNDS_OF_FOUNDS -> Icons.Outlined.Wallet
             FiiType.BRICK -> Icons.Outlined.House
+            FiiType.NOT_FILLED -> Icons.Outlined.Pending
         }
 
         Row {

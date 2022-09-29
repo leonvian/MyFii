@@ -1,18 +1,16 @@
 package com.lvc.meufi
 
 import android.icu.util.Calendar
-import androidx.compose.ui.test.createTestContext
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.lvc.meufi.data_scripts.ScripManager
-import com.lvc.meufi.model.MonthDayYear
 import com.lvc.meufi.model.MyFii
 import com.lvc.meufi.persistence.local.FiiDAO
 import com.lvc.meufi.persistence.local.FiiDatabase
 import com.lvc.meufi.persistence.local.FiiDividendDAO
 import com.lvc.meufi.persistence.local.LocalDataRegister
 import com.lvc.meufi.persistence.local.MyFiiDAO
-import com.lvc.meufi.utils.toMonthYear
+import com.lvc.meufi.utils.toMonthYearDay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -53,7 +51,7 @@ class ScriptManagerTests {
     @Test
     fun testUpdateWalletFiisScript() = runTest {
         //Produce and store last month fiis
-        val thisMonth = Calendar.getInstance().time.toMonthYear()
+        val thisMonth = Calendar.getInstance().time.toMonthYearDay()
 
         val calendarLastMonth = Calendar.getInstance()
         calendarLastMonth.add(Calendar.MONTH, -1)
@@ -61,7 +59,7 @@ class ScriptManagerTests {
         val myFii = MyFii(
             fiiCode = FII_CODE_EXAMPLE,
             amount = 10,
-            updatedAt = calendarLastMonth.time.toMonthYear()
+            updatedAt = calendarLastMonth.time.toMonthYearDay()
         )
         myFiiDAO.saverOrUpdate(myFii)
 

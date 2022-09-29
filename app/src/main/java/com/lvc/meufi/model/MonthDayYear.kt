@@ -1,13 +1,13 @@
 package com.lvc.meufi.model
 
-import com.lvc.meufi.utils.toMonthYear
+import com.lvc.meufi.utils.toMonthYearDay
 import java.util.*
 
 data class MonthDayYear(val month: Int, val year: Int, val day: Int = 0) : Comparable<MonthDayYear> {
 
     companion object {
 
-        fun now(): MonthDayYear = Calendar.getInstance().toMonthYear()
+        fun now(): MonthDayYear = Calendar.getInstance().toMonthYearDay()
     }
 
     override fun compareTo(other: MonthDayYear): Int {

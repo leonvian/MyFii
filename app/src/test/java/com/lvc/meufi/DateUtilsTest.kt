@@ -3,12 +3,9 @@ package com.lvc.meufi
 import com.lvc.meufi.model.MonthDayYear
 import com.lvc.meufi.utils.convertSiteStringToDate
 import com.lvc.meufi.utils.toDate
-import com.lvc.meufi.utils.toDateString
 import com.lvc.meufi.utils.toMonth
-import com.lvc.meufi.utils.toMonthYear
+import com.lvc.meufi.utils.toMonthYearDay
 import java.util.Calendar
-import java.util.Queue
-import java.util.Stack
 import org.junit.Assert
 import org.junit.Test
 
@@ -24,7 +21,7 @@ class DateUtilsTest {
 
         Assert.assertEquals(Calendar.FEBRUARY, calendar.get(Calendar.MONTH))
 
-        val monthYear = date.toMonthYear()
+        val monthYear = date.toMonthYearDay()
         val calendarMonthYear = Calendar.getInstance()
         calendarMonthYear.time = monthYear.toDate()
 

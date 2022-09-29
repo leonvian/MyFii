@@ -27,7 +27,7 @@ fun MonthDayYear.toDate(): Date {
 fun MonthDayYear.toMonth(): String =
     Month.of(month+ 1).getDisplayName(TextStyle.FULL, Locale.getDefault())
 
-fun Date.toMonthYear(): MonthDayYear {
+fun Date.toMonthYearDay(): MonthDayYear {
     val calendar = Calendar.getInstance()
     calendar.time = this
 
@@ -38,7 +38,9 @@ fun Date.toMonthYear(): MonthDayYear {
     )
 }
 
-fun Calendar.toMonthYear(): MonthDayYear = time.toMonthYear()
+fun Calendar.toMonthYearDay(): MonthDayYear = time.toMonthYearDay()
+
+fun Calendar.toJustMonthYear(): MonthDayYear = time.toMonthYearDay().copy(day = 0)
 
 // 31.08.2022
 fun String.convertSiteStringToDate(): MonthDayYear {

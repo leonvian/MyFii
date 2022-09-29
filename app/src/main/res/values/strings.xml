@@ -9,9 +9,12 @@
     <string name="your_fiis">Your fiis</string>
     <string name="wallet">Wallet</string>
     <string name="add">ADD</string>
+    <string name="save">SAVE</string>
     <string name="loading_text">We are collecting data!</string>
 
     <string name="fii_code">Fii Code</string>
     <string name="amount">Amount</string>
+
+    <string name="dividends_for">Dividends for </string>
 
 </resources>

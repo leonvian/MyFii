@@ -1,6 +1,7 @@
 package com.lvc.meufi.model
 
 import androidx.room.Embedded
+import androidx.room.Ignore
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
@@ -14,8 +15,11 @@ data class FiiDividendData(
     @Embedded
     val paymentDate: MonthDayYear,
     val dividend: Float,
-    val type: FiiType
+    val type: FiiType,
 ) {
+    val filled: Boolean
+        get() = type == FiiType.NOT_FILLED
+
     val monthYear: MonthDayYear
         get() = paymentDate
 
@@ -36,4 +40,4 @@ fun Float.round2Places(): String {
 }
 
 private fun String.brMoneyStyle(): String =
-    replace(".",",").replace("$","")
+    replace(".", ",").replace("$", "")

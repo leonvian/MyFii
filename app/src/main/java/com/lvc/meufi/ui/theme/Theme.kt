@@ -5,6 +5,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import com.lvc.meufi.ui.theme.FiiColor.Purple200
+import com.lvc.meufi.ui.theme.FiiColor.Purple500
+import com.lvc.meufi.ui.theme.FiiColor.Purple700
+import com.lvc.meufi.ui.theme.FiiColor.Teal200
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
