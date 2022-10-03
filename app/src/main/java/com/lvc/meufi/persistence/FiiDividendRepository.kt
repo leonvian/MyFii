@@ -30,7 +30,9 @@ class FiiDividendRepository(
 
     suspend fun getDatesThatContainsFiis(): List<MonthDayYear> {
         return withContext(Dispatchers.Default) {
-            myFiiDAO.getMyFiisDates()
+            myFiiDAO.getMyFiisDates().distinctBy {
+                Pair(it.year, it.month)
+            }
         }
     }
 
