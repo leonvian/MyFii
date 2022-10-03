@@ -114,14 +114,14 @@ class MainActivity : ComponentActivity() {
                             },
                             selectedMonth = homeViewModel.selectedMonth.value,
                             onSelectMonth = homeViewModel::onSelectedMonth,
-                            months = homeViewModel.months.value
+                            months = homeViewModel.months.value,
+                            onUpdateClick = homeViewModel::forceReloadDividendPage
                         )
                     }
                 }
             }
         }
 
-        homeViewModel.loadMonthsToDisplay()
         loadData()
     }
 
@@ -165,6 +165,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun loadData(monthDayYear: MonthDayYear = Date().toMonthYearDay()) {
-        homeViewModel.loadFiiDividedPage(monthDayYear)
+        homeViewModel.loadFiiDividedPage(monthDayYear,false)
     }
 }

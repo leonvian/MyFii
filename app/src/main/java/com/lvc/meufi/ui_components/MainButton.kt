@@ -1,6 +1,7 @@
 package com.lvc.meufi.ui_components
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -34,9 +35,10 @@ fun MainIconButton(
 ) {
     IconButton(
         onClick = onClick,
-        modifier = modifier.padding(16.dp),
+        modifier = modifier.padding(4.dp),
         content = {
             Icon(
+                modifier = modifier.size(24.dp),
                 imageVector = icon,
                 contentDescription = contentDescription
             )

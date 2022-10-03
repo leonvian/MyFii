@@ -17,4 +17,8 @@
 
     <string name="dividends_for">Dividends for </string>
 
+    <string name="will_be_paid_at">Paid in %1$s days</string>
+    <string name="no_dividends_informed_yet">Not informed yet</string>
+    <string name="already_paid">PAID</string>
+
 </resources>

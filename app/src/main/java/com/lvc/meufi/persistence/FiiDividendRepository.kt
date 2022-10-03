@@ -5,11 +5,13 @@ import com.lvc.meufi.model.FiiDividendData
 import com.lvc.meufi.model.MonthDayYear
 import com.lvc.meufi.persistence.local.FiiDAO
 import com.lvc.meufi.persistence.local.FiiDividendDAO
+import com.lvc.meufi.persistence.local.LocalDataRegister
 import com.lvc.meufi.persistence.local.MyFiiDAO
 import com.lvc.meufi.persistence.remote.RawDividendData
 import com.lvc.meufi.persistence.remote.SkrapeHandler
 import com.lvc.meufi.utils.toMonthYearDay
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,7 +22,8 @@ class FiiDividendRepository(
     private val fiiDividendDAO: FiiDividendDAO,
     private val myFiiDAO: MyFiiDAO,
     private val scrapData: SkrapeHandler,
-    private val scriptManager: ScripManager
+    private val scriptManager: ScripManager,
+    private val localDataRegister: LocalDataRegister
 ) {
 
     private val scope = CoroutineScope(Dispatchers.Default)
@@ -46,22 +49,38 @@ class FiiDividendRepository(
         return dividendData
     }
 
-    suspend fun loadFiiDividends() {
+    suspend fun loadFiiDividends(monthDayYear: MonthDayYear, force: Boolean = false) {
         withContext(Dispatchers.IO) {
             scriptManager.saveKnownData()
             scriptManager.updateWalletFiis()
 
-            val today = Date().toMonthYearDay()
-            val fiis = fiiDAO.getNotUpdatedFiis(month = today.month, year = today.year)
-            fiis.forEach { fii ->
-                scrapData.collectData(
-                    fiiCode = fii.code,
-                    onDividendsCollected = { rawDividendData ->
-                        saveDividends(fii.code, rawDividendData)
-                    }
-                )
+            val fiis = fiiDAO.getNotUpdatedFiis(month = monthDayYear.month, year = monthDayYear.year)
+            if (shouldSkrapData(force)) {
+                fiis.forEach { fii ->
+                    scrapData.collectData(
+                        fiiCode = fii.code,
+                        onDividendsCollected = { rawDividendData ->
+                            saveDividends(fii.code, rawDividendData)
+                        }
+                    )
+                }
+                markDataCollected()
             }
         }
+    }
+
+    private fun shouldSkrapData(force: Boolean): Boolean {
+        if(force) return true
+
+       return localDataRegister.getLastTimeApiCall()?.let { lastTime ->
+            val diff = Date().time - lastTime
+            val diffInHours = TimeUnit.HOURS.convert(diff, TimeUnit.MILLISECONDS)
+            return diffInHours > 1
+        } ?: true
+    }
+
+    private fun markDataCollected() {
+        localDataRegister.registerUpdateAPICall()
     }
 
     private fun saveDividends(fii: String, rawDividendData: List<RawDividendData>) {

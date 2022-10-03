@@ -22,19 +22,24 @@ class HomeViewModel(
     val selectedMonth = mutableStateOf(
         Calendar.getInstance().toJustMonthYear()
     )
-    val months = mutableStateOf( listOf<MonthDayYear>() )
+    val months = mutableStateOf(listOf<MonthDayYear>())
 
     fun onSelectedMonth(monthDayYear: MonthDayYear) {
-        selectedMonth.value = monthDayYear
-        loadFiiDividedPage(monthDayYear)
+        if (isDifferentDate(monthDayYear)) {
+            selectedMonth.value = monthDayYear
+            loadFiiDividedPage(monthDayYear)
+        }
     }
 
-    fun loadFiiDividedPage(monthDayYear: MonthDayYear) {
+    private fun isDifferentDate(monthDayYear: MonthDayYear): Boolean =
+        selectedMonth.value.year != monthDayYear.year || selectedMonth.value.month != monthDayYear.month
+
+    fun loadFiiDividedPage(monthDayYear: MonthDayYear, forceSkrapData: Boolean = false) {
         viewModelScope.launch {
             loading.value = true
 
             Log.i("DATA", "SAVE DIVIDENDS")
-            fiiDividendRepository.loadFiiDividends()
+            fiiDividendRepository.loadFiiDividends(monthDayYear, forceSkrapData)
 
             Log.i("DATA", "Get Dividends Locally")
             val fiiDividendData = fiiDividendRepository.getFiiOnWalletData(monthDayYear)
@@ -44,18 +49,17 @@ class HomeViewModel(
                 dividendPage.value = DividendPageData(monthDayYear)
             }
 
+            months.value = fiiDividendRepository.getDatesThatContainsFiis()
             loading.value = false
         }
     }
 
-    fun loadMonthsToDisplay() {
-        viewModelScope.launch {
-           months.value = fiiDividendRepository.getDatesThatContainsFiis()
-        }
+    fun reloadDividendPage() {
+        loadFiiDividedPage(selectedMonth.value, false)
     }
 
-    fun reloadDividendPage() {
-        loadFiiDividedPage(selectedMonth.value)
+    fun forceReloadDividendPage() {
+        loadFiiDividedPage(selectedMonth.value, true)
     }
 
     private fun List<FiiDividendData>.toDividendPage(): DividendPageData {

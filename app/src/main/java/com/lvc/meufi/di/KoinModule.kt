@@ -29,7 +29,7 @@ val appModule = module {
         FiiDatabase.createDatabase(androidContext()).createMyFiiDAO()
     }
 
-    single { FiiDividendRepository(get(), get(), get(), get(), get() ) }
+    single { FiiDividendRepository(get(), get(), get(), get(), get(), get() ) }
 
     single { ScripManager(get(), get(), get() ) }
 

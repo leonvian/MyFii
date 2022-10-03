@@ -1,9 +1,13 @@
 package com.lvc.meufi.model
 
+import java.util.concurrent.TimeUnit
 import androidx.room.Embedded
 import androidx.room.Ignore
+import com.lvc.meufi.utils.toDate
+import com.lvc.meufi.utils.toMonthYearDay
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.util.Date
 
 /**
  * It mix the MyFii data and the FiiDividend data.
@@ -29,6 +33,18 @@ data class FiiDividendData(
     fun dividendSumToDisplay() = dividendSum.round2Places()
 
     fun dividendToDisplay() = dividend.round2Places()
+
+    fun daysToBePaid(): Long {
+        val today = Date()
+        val paymentDateD = paymentDate.toDate()
+        return if (paymentDateD.time < today.time) {
+            0
+        } else {
+            val diff = (paymentDateD.time - today.time)
+            val days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
+            days
+        }
+    }
 
 }
 

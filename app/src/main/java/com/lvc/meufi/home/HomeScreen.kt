@@ -27,6 +27,8 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.House
 import androidx.compose.material.icons.outlined.Pending
+import androidx.compose.material.icons.outlined.Update
+import androidx.compose.material.icons.outlined.Upgrade
 import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +49,6 @@ import com.lvc.meufi.ui_components.MainIconButton
 import com.lvc.meufi.ui.theme.FiiColor
 import com.lvc.meufi.ui_components.MonthYearPicker
 import com.lvc.meufi.utils.toDateString
-import java.time.Month
-import java.util.Calendar
-import org.apache.xpath.operations.Mod
 
 @Composable
 fun HomeScreenView(
@@ -60,7 +59,8 @@ fun HomeScreenView(
     onAddClick: () -> Unit,
     selectedMonth: MonthDayYear,
     onSelectMonth: (MonthDayYear) -> Unit,
-    months: List<MonthDayYear>
+    months: List<MonthDayYear>,
+    onUpdateClick: () -> Unit
 ) {
     if (loading) {
         LoadingView()
@@ -72,7 +72,8 @@ fun HomeScreenView(
             onAddClick = onAddClick,
             selectedMonth = selectedMonth,
             onSelectMonth = onSelectMonth,
-            months = months
+            months = months,
+            onUpdateClick = onUpdateClick
         )
     }
 }
@@ -85,7 +86,8 @@ private fun WalletScreen(
     onSelectMonth: (MonthDayYear) -> Unit,
     onClickDividend: (FiiDividendData) -> Unit,
     onAddClick: () -> Unit,
-    months: List<MonthDayYear>
+    months: List<MonthDayYear>,
+    onUpdateClick: () -> Unit
 ) {
     val expandDate = remember { mutableStateOf(false) }
     Column(
@@ -95,7 +97,8 @@ private fun WalletScreen(
             onAddClick = onAddClick,
             onCalendarClick = {
                 expandDate.value = !expandDate.value
-            }
+            },
+            onUpdateClick = onUpdateClick
         )
 
         AnimatedVisibility(visible = expandDate.value) {
@@ -154,6 +157,7 @@ private fun LoadingView() {
 private fun WalletTitle(
     onAddClick: () -> Unit,
     onCalendarClick: () -> Unit,
+    onUpdateClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -168,7 +172,15 @@ private fun WalletTitle(
             style = MaterialTheme.typography.h1
         )
 
-        Row {
+        Row(
+            horizontalArrangement = Arrangement.End
+        ) {
+
+            MainIconButton(
+                icon = Icons.Outlined.Update,
+                onClick = onUpdateClick
+            )
+
             MainIconButton(
                 icon = Icons.Outlined.CalendarMonth,
                 onClick = onCalendarClick
@@ -288,6 +300,18 @@ fun DividendCard(
             }
             .padding(16.dp)
     ) {
+        val notFilled = dividendData.type == FiiType.NOT_FILLED
+        val bePaidIn = dividendData.daysToBePaid()
+        val dividendDateStr =
+            when {
+                notFilled -> stringResource(id = R.string.no_dividends_informed_yet)
+                bePaidIn == 0L -> stringResource(id = R.string.already_paid)
+                else -> stringResource(
+                    id = R.string.will_be_paid_at,
+                    dividendData.daysToBePaid().toString()
+                )
+            }
+
         val icon = when (dividendData.type) {
             FiiType.PAPER -> Icons.Outlined.Description
             FiiType.FOUNDS_OF_FOUNDS -> Icons.Outlined.Wallet
@@ -311,11 +335,11 @@ fun DividendCard(
                     style = MaterialTheme.typography.h1
                 )
 
-                Spacer(modifier = Modifier.size(8.dp))
+                Spacer(modifier = Modifier.size(4.dp))
 
                 Text(
                     text = "R$ ${dividendData.dividendToDisplay()}",
-                    fontSize = 12.sp
+                    fontSize = 14.sp
                 )
             }
 
@@ -326,13 +350,21 @@ fun DividendCard(
                         dividendData.amount,
                         dividendData.amount.toString()
                     ),
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     style = MaterialTheme.typography.body1
                 )
                 Text(
                     text = "R$ ${dividendData.dividendSumToDisplay()}",
                     fontSize = 22.sp
                 )
+
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(
+                    text = dividendDateStr,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colors.primary
+                )
+
             }
         }
     }
