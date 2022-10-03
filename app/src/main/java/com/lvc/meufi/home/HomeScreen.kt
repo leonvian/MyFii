@@ -323,7 +323,7 @@ fun DividendCard(
             Icon(
                 modifier = Modifier
                     .weight(0.2f)
-                    .size(24.dp),
+                    .size(32.dp),
                 imageVector = icon,
                 contentDescription = ""
             )
