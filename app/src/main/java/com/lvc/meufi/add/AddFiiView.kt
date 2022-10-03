@@ -24,7 +24,7 @@ import com.lvc.meufi.ui_components.MainButton
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    AddFiiView(isEditModeOn = false, fiiCode = "", fiiCodeOnValueChange = { }, amount = 0, amountOnValueChange = {}, onSaveClicked = {})
+    AddFiiView(isEditModeOn = false, fiiCode = "", fiiCodeOnValueChange = { }, amount = "", amountOnValueChange = {}, onSaveClicked = {})
 }
 
 @Composable
@@ -32,8 +32,8 @@ fun AddFiiView(
     isEditModeOn: Boolean,
     fiiCode: String,
     fiiCodeOnValueChange: (String) -> Unit,
-    amount: Int,
-    amountOnValueChange: (Int) -> Unit,
+    amount: String,
+    amountOnValueChange: (String) -> Unit,
     onSaveClicked: () -> Unit
 ) {
     MeuFiTheme {
@@ -59,7 +59,7 @@ fun AddFiiView(
                 value = amount.toString(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = { text ->
-                    amountOnValueChange(text.toInt())
+                   amountOnValueChange(text)
                 }
             )
 

@@ -17,36 +17,44 @@ class AddFiiViewModel(
 ) : ViewModel() {
 
     var fiiCode = mutableStateOf("")
-    var fiiAmount = mutableStateOf(0)
+    var fiiAmount = mutableStateOf("")
     var isEditModeOn = mutableStateOf(false)
 
     fun applyEntryFii() {
         isEditModeOn.value = false
         onFiiCode("")
-        onFiiAmount(0)
+        onFiiAmount("")
     }
 
     fun applyFiiToEdit(fiiDividendData: FiiDividendData) {
         isEditModeOn.value = true
         onFiiCode(fiiDividendData.fiiCode)
-        onFiiAmount(fiiDividendData.amount)
+        onFiiAmount(fiiDividendData.amount.toString())
     }
 
     fun onFiiCode(fiiCode: String) {
         this.fiiCode.value = fiiCode
     }
 
-    fun onFiiAmount(amount: Int) {
+    fun onFiiAmount(amount: String) {
         this.fiiAmount.value = amount
     }
 
     fun onSaveClicked() {
         val myFii = MyFii(
             fiiCode = fiiCode.value,
-            amount = fiiAmount.value
+            amount = fiiAmount.value.toIntSafely()
         )
         viewModelScope.launch {
             myFiiDAO.saverOrUpdate(myFii)
+        }
+    }
+
+    private fun String.toIntSafely(): Int {
+        return try {
+            this.toInt()
+        } catch (e: java.lang.Exception) {
+            0
         }
     }
 
