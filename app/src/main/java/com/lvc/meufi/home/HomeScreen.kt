@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -302,14 +303,23 @@ fun DividendCard(
     ) {
         val notFilled = dividendData.type == FiiType.NOT_FILLED
         val bePaidIn = dividendData.daysToBePaid()
+        val alreadyPaid = bePaidIn == 0L
+
         val dividendDateStr =
             when {
                 notFilled -> stringResource(id = R.string.no_dividends_informed_yet)
-                bePaidIn == 0L -> stringResource(id = R.string.already_paid)
+                alreadyPaid -> stringResource(id = R.string.already_paid)
                 else -> stringResource(
                     id = R.string.will_be_paid_at,
                     dividendData.daysToBePaid().toString()
                 )
+            }
+
+        val dividendDateColor =
+            when {
+                notFilled -> Color.Black
+                alreadyPaid -> FiiColor.Green600
+                else -> FiiColor.Purple700
             }
 
         val icon = when (dividendData.type) {
@@ -370,8 +380,9 @@ fun DividendCard(
                 Spacer(modifier = Modifier.size(4.dp))
                 Text(
                     text = dividendDateStr,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colors.primary
+                    fontSize = 14.sp,
+                    color = dividendDateColor,
+                    style = MaterialTheme.typography.h1
                 )
 
             }
