@@ -341,6 +341,15 @@ fun DividendCard(
                     text = "R$ ${dividendData.dividendToDisplay()}",
                     fontSize = 14.sp
                 )
+
+                dividendData.dividendYieldToDisplay()?.let {
+                    Spacer(modifier = Modifier.size(4.dp))
+
+                    Text(
+                        text = it,
+                        fontSize = 14.sp
+                    )
+                }
             }
 
             Column(modifier = Modifier.weight(0.4f)) {

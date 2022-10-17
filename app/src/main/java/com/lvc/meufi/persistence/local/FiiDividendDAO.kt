@@ -23,7 +23,7 @@ interface FiiDividendDAO {
     suspend fun getFiiWithDividend(): List<FiiDividendData>
 
     @Query(
-        "SELECT MyFii.fiiCode, MyFii.amount, FiiDividend.month, FiiDividend.year, FiiDividend.day, FiiDividend.dividend, Fii.type FROM FiiDividend INNER JOIN Fii ON Fii.code = FiiDividend.fiiCode INNER JOIN MyFii ON MyFii.fiiCode = FiiDividend.fiiCode AND MyFii.month = FiiDividend.month AND MyFii.year = FiiDividend.year  WHERE FiiDividend.month = :month AND FiiDividend.year = :year ORDER BY FiiDividend.year, FiiDividend.month DESC"
+        "SELECT MyFii.fiiCode, MyFii.amount, FiiDividend.month, FiiDividend.year, FiiDividend.day, FiiDividend.dividend, FiiDividend.dividendYieldPercentage, Fii.type  FROM FiiDividend INNER JOIN Fii ON Fii.code = FiiDividend.fiiCode INNER JOIN MyFii ON MyFii.fiiCode = FiiDividend.fiiCode AND MyFii.month = FiiDividend.month AND MyFii.year = FiiDividend.year  WHERE FiiDividend.month = :month AND FiiDividend.year = :year ORDER BY FiiDividend.year, FiiDividend.month DESC"
     )
     suspend fun getFiiWithDividend(month: Int, year: Int): List<FiiDividendData>
 

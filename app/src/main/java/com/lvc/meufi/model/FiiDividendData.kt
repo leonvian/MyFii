@@ -19,11 +19,9 @@ data class FiiDividendData(
     @Embedded
     val paymentDate: MonthDayYear,
     val dividend: Float,
-    val type: FiiType,
+    val dividendYieldPercentage: Float? = 0.0f,
+    val type: FiiType
 ) {
-    val filled: Boolean
-        get() = type == FiiType.NOT_FILLED
-
     val monthYear: MonthDayYear
         get() = paymentDate
 
@@ -44,6 +42,10 @@ data class FiiDividendData(
             val days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
             days
         }
+    }
+
+    fun dividendYieldToDisplay(): String? = dividendYieldPercentage?.let {
+        "DY % $it"
     }
 
 }
