@@ -12,7 +12,6 @@ import com.lvc.meufi.persistence.local.FiiDatabase
 import com.lvc.meufi.persistence.local.FiiDividendDAO
 import com.lvc.meufi.persistence.local.MyFiiDAO
 import com.lvc.meufi.utils.toDate
-import com.lvc.meufi.utils.toMonth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
