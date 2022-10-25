@@ -93,5 +93,4 @@ class FiiDAOTest {
         Assert.assertNotNull(notUpdateFiis.find { it.code ==  "CPTS11" })
         Assert.assertNotNull(notUpdateFiis.find { it.code ==  "DEVA11" })
     }
-
 }
