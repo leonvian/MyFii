@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import java.util.*
 
 /**
- * Represents an action of buying a fii
+ * Represents an action of buying a fii.
  */
 @Entity
 data class Buy(
