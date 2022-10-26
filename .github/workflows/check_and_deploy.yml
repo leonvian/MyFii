@@ -35,7 +35,7 @@ jobs:
 
   test:
     runs-on: macos-latest
-    needs: build
+   # needs: build
 
     steps:
       - name: Checkout the code
@@ -54,7 +54,6 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          target: 29
           arch: x86
           profile: Nexus 6
           script: ./gradlew connectedCheck --stacktrace
