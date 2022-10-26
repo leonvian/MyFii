@@ -24,8 +24,8 @@ jobs:
           distribution: 'temurin'
           java-version: 11
 
-      - name: Build the app
-        run: ./gradlew assembleDebug
+    #  - name: Build the app
+    #    run: ./gradlew assembleDebug
 
       - name: Upload apk
         uses: actions/upload-artifact@v2
@@ -37,19 +37,16 @@ jobs:
   test:
     runs-on: macos-latest
     needs: build
-    strategy:
-      matrix:
-        api-level: [21, 23, 29]
-        target: [default]
 
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v2
-        with:
-          java-version: 11
+          uses: actions/setup-java@v3
+          with:
+            distribution: 'temurin'
+            java-version: 11
 
       - name: Run unit tests
         run: ./gradlew test --stacktrace
@@ -57,8 +54,8 @@ jobs:
       - name: Instrumentation Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
+          api-level: 29
+          target: 29
           arch: x86
           profile: Nexus 6
           script: ./gradlew connectedCheck --stacktrace
