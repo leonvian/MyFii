@@ -41,7 +41,7 @@ class HomeViewModel(
             Log.i("DATA", "SAVE DIVIDENDS")
             fiiDividendRepository.loadFiiDividends(monthDayYear, forceSkrapData)
 
-            Log.i("DATA", "Get Dividends Locally")
+            Log.i("DATA", "Get Dividends Locally.")
             val fiiDividendData = fiiDividendRepository.getFiiOnWalletData(monthDayYear)
             if (fiiDividendData.isNotEmpty()) {
                 dividendPage.value = fiiDividendData.toDividendPage()
