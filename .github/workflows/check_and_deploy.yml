@@ -43,10 +43,10 @@ jobs:
   android_tests:
     runs-on: [macos-latest]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: Instrumentation Tests
-        uses: reactivecircus/android-emulator-runner@v3
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           script: ./gradlew connectedAndroidTest
