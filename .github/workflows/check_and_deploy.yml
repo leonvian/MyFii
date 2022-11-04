@@ -1,13 +1,10 @@
-## 1
 name: Test and deploy
 
-## Actions that will be executed when you push code currently none
 on:
   pull_request:
     branches:
       - main
 
-    # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
 jobs:
@@ -31,12 +28,6 @@ jobs:
       - name: Build the app
         run: ./gradlew assembleDebug
 
-      - name: Upload apk
-          uses: actions/upload-artifact@v2
-          with:
-            name: debug apk
-            path: app/build/outputs/apk/debug/app-debug.apk
-
 
   unit_tests:
     runs-on: [ubuntu-latest]
@@ -52,7 +43,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Instrumentation Tests
-        uses: reactivecircus/android-emulator-runner@v3
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           script: ./gradlew connectedAndroidTest
