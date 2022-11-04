@@ -1,13 +1,10 @@
-## 1
 name: Test and deploy
 
-## Actions that will be executed when you push code currently none
 on:
   pull_request:
     branches:
       - main
 
-    # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
 jobs:
